@@ -1,0 +1,23 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import './step/the_app_is_running.dart';
+import './step/i_see_text.dart';
+import './step/i_tap_icon.dart';
+
+void main() {
+  group('''Counter''', () {
+    testWidgets('''Initial counter value is 0''', (tester) async {
+      await theAppIsRunning(tester);
+      await iSeeText(tester, '0');
+    });
+    testWidgets('''Add Button Press first time''', (tester) async {
+      await theAppIsRunning(tester);
+      await iTapIcon(tester, Icons.add);
+      await iSeeText(tester, '1');
+    });
+  });
+}
