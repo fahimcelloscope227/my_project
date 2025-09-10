@@ -70,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void add(){
     setState(() {
-      sum = int.parse(controllerA.text) - int.parse(controllerB.text);
+      sum = int.parse(controllerA.text) + int.parse(controllerB.text);
     });
   }
   void substraction(){
