@@ -17,7 +17,7 @@ class MainActivityTest(private val dartTestName: String) {
                 InstrumentationRegistry.getInstrumentation() as PatrolJUnitRunner
             instrumentation.setUp(MainActivity::class.java)
             instrumentation.waitForPatrolAppService()
-            return instrumentation.listDartTests()
+            return instrumentation.listDartTests() as Array<String>
         }
     }
 
