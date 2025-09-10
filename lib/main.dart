@@ -55,6 +55,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int sum = 0;
+  int sub = 0;
   final controllerA = TextEditingController();
   final controllerB = TextEditingController();
 
@@ -70,6 +71,11 @@ class _MyHomePageState extends State<MyHomePage> {
   void add(){
     setState(() {
       sum = int.parse(controllerA.text) + int.parse(controllerB.text);
+    });
+  }
+  void substraction(){
+    setState(() {
+      sub = (int.parse(controllerA.text) - int.parse(controllerB.text)).abs();
     });
   }
 
@@ -98,13 +104,24 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
 
-            ElevatedButton(onPressed: add, child: Icon(Icons.add)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(onPressed: add, child: Icon(Icons.add)),
+                ElevatedButton(onPressed: substraction, child: Icon(Icons.minimize)),
+              ],
+            ),
 
             const Text('You have pushed the button this many times:'),
             Text(
               '$sum',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            Text(
+              '$sub',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+
           ],
         ),
       ),
