@@ -126,7 +126,7 @@ class BiometricService {
   Future<void> storeBiometricTemplate(String template1, String template2) async {
     try {
       // Create a combined hash of both templates
-      final combinedTemplate = template1;
+      final combinedTemplate = template1 ;
       final bytes = utf8.encode(combinedTemplate);
       final digest = sha256.convert(bytes);
 
