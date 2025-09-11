@@ -126,7 +126,7 @@ class BiometricService {
   Future<void> storeBiometricTemplate(String template1, String template2) async {
     try {
       // Create a combined hash of both templates
-      final combinedTemplate = template1 + template2;
+      final combinedTemplate = template1;
       final bytes = utf8.encode(combinedTemplate);
       final digest = sha256.convert(bytes);
 
@@ -141,6 +141,10 @@ class BiometricService {
 // Verify biometric template - REAL IMPLEMENTATION
   Future<bool> verifyBiometric(String capturedTemplate) async {
     try {
+      dev.log("legacy");
+      dev.log("capturedTemplate.isEmpty=== ${capturedTemplate.isEmpty}");
+      dev.log("capturedTemplate=== ${capturedTemplate}");
+
       // 1. Input validation
       if (capturedTemplate.isEmpty) {
         throw Exception('Invalid captured template - template cannot be empty');
@@ -148,8 +152,15 @@ class BiometricService {
 
       // 2. Get stored enrollment data
       final enrollmentDataJson = await _storage.read(key: 'biometric_enrollment_data');
+      final templateData = await _storage.read(key: 'biometric_template');
       List<String> storedTemplates = [];
 
+      dev.log("enrollmentDataJson === $enrollmentDataJson");
+
+
+      if(templateData != null){
+        storedTemplates .add(templateData);
+      }
       if (enrollmentDataJson != null) {
         // New format with multiple templates and metadata
         final enrollmentData = json.decode(enrollmentDataJson) as Map<String, dynamic>;
@@ -169,38 +180,46 @@ class BiometricService {
       }
 
       // 3. Fallback to legacy format if new format not found
-      if (storedTemplates.isEmpty) {
-        final legacyTemplate = await _storage.read(key: 'biometric_template');
-        if (legacyTemplate == null) {
-          dev.log("legacy");
-          return false;
-        }
-
-        // Legacy hash-based verification
-        final combinedTemplate = capturedTemplate + capturedTemplate;
-        final bytes = utf8.encode(combinedTemplate);
-        final digest = sha256.convert(bytes);
-        return digest.toString() == legacyTemplate;
-      }
+      dev.log("storedTemplates === $storedTemplates");
+      // if (storedTemplates.isEmpty) {
+      //   final legacyTemplate = await _storage.read(key: 'biometric_template');
+      //   dev.log("legacyTemplate === $legacyTemplate");
+      //   if (legacyTemplate == null) {
+      //     dev.log("legacy");
+      //     return false;
+      //   }
+      //
+      //   // Legacy hash-based verification
+      //   final combinedTemplate = capturedTemplate + capturedTemplate;
+      //   final bytes = utf8.encode(combinedTemplate);
+      //   final digest = sha256.convert(bytes);
+      //   return digest.toString() == legacyTemplate;
+      // }
 
       // 4. Perform advanced biometric matching
       double bestMatchScore = 0.0;
       int bestTemplateIndex = -1;
       Map<String, double> bestAlgorithmScores = {};
 
+      dev.log("storedTemplates === ${storedTemplates.length}");
       for (int i = 0; i < storedTemplates.length; i++) {
         final storedTemplate = storedTemplates[i];
 
-        // Calculate comprehensive match score
-        final matchScores = await _calculateBiometricMatchScore(capturedTemplate, storedTemplate);
-        final combinedScore = matchScores['combined'] ?? 0.0;
+        final bytes = utf8.encode(capturedTemplate);
+        final finalCapturedTemplate = sha256.convert(bytes);
 
+        // Calculate comprehensive match score
+        final matchScores = await _calculateBiometricMatchScore(finalCapturedTemplate.toString(), storedTemplate);
+        final combinedScore = matchScores['combined'] ?? 0.0;
+        dev.log("combinedScore === $combinedScore");
         if (combinedScore > bestMatchScore) {
           bestMatchScore = combinedScore;
           bestTemplateIndex = i;
           bestAlgorithmScores = matchScores;
         }
       }
+
+      dev.log("bestTemplateIndex === $bestTemplateIndex");
 
       // 5. Apply security adjustments
       final finalScore = _applySecurityAdjustments(
@@ -219,7 +238,9 @@ class BiometricService {
 
       return isMatch;
 
-    } catch (e) {
+    } catch (e,st) {
+      debugPrint("exception === ${e.toString()}",);
+      debugPrintStack(stackTrace: st);
       throw Exception('Failed to verify biometric: $e');
     }
   }
@@ -261,7 +282,8 @@ class BiometricService {
         'combined': math.min(1.0, math.max(0.0, combinedScore)),
       };
 
-    } catch (e) {
+    } catch (e,st) {
+      debugPrintStack(stackTrace: st);
       return {'hamming': 0.0, 'cosine': 0.0, 'jaccard': 0.0, 'entropy': 0.0, 'combined': 0.0};
     }
   }
