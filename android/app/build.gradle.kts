@@ -45,3 +45,9 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    implementation("androidx.biometric:biometric:1.1.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.fragment:fragment-ktx:1.6.1")
+}
