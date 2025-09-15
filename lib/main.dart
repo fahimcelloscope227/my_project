@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_project/features/biometric_auth/presentation/biometric_auth_page.dart';
+import 'package:my_project/features/loca_auth/presenter/finger_print_auth.dart' show FingerPrintAuth;
 
 void main() {
   runApp(const MyApp());
@@ -17,10 +18,11 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
 
       ),
-      initialRoute: "/bio_auth",
+      initialRoute: "/local_auth",
       routes: {
         "/": (context) => MyHomePage(title: '',),
         "/bio_auth": (context) =>BiometricAuthPage(),
+        "/local_auth" : (context) => FingerPrintAuth()
       },
       // home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
